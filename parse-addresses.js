@@ -35,27 +35,30 @@ return fetch("https://api.liquid.vote/bills")
         "2004 Calendar Year":true, 
         "2012 MOE":true, 
         "2004 Trust":true,
-        "2016 Edition":true, 
+        "2016 Edition":true,
+        "Initial Annual Base Rent":true,
+        "000 Payment":true,
       };
 
-      //console.log(matchedBill.matchedStrings,matchedBill.title);
-      
       let excludedMatches = matchedBill.matchedStrings.filter((string) => {
+        
         let hasMatched = false;
         for(let key in exclusionTerms){
+
           hasMatched = string.includes(key);
           if(hasMatched){
             return !hasMatched;
-          } 
-        }       
+          }
+        }
+
         return !hasMatched; 
       });
-      //console.log(excludedMatches)
-      return excludedMatches.length
+
+      //
+      return excludedMatches.length;
 
     })
     .filter((matches) => {
-      //console.log(matches);
       return true;
     })
     .filter(customFilter);

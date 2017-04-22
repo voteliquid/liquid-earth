@@ -36,6 +36,7 @@ const toggleDimension = "document.querySelector('earth-app /deep/ paper-drawer-p
 
 //Empty array for output
 const locationData = [];
+const pauseTime = 5000;
 
 //Set up driver
 var driver = new Builder()
@@ -112,9 +113,8 @@ function navigate(address,index,collection){
       
       //Loop infinitely; mediate
       if(index === collection.length-1){
-        driver.sleep(20000).then(() => {
+        driver.sleep(pauseTime).then(() => {
           console.log('starting to loop infinite')
-          console.log(collection);
           collection.forEach((bill,index,collection) => {
             navigate(bill.matchedStrings[0],index,collection)});
         })
@@ -124,28 +124,32 @@ function navigate(address,index,collection){
 
   //grab url, pause before next navigation
   getEarthUrl(fullAddress,index); 
-  driver.sleep(20000);
+  driver.sleep(pauseTime);
   
 }
 
 
 function latestDate(bill){
+  
   return bill.date === "2017-04-25" || bill.date === "2017-04-18";
 }
 
 requestAddresses(null,latestDate).then( (addresses) => {
   driver.sleep(15000);
 
-  addresses.sort((a,b) => {
-    return new Date(a.date).getDate() > new Date(b.date).getDate() ? -1 : 1; 
-  })
-
-  addresses.forEach( (bill,index,collection) => {
+  let seen = {};
+  addresses
+    .filter((bill,index,collection) => {
+      let billAddress = bill.matchedStrings[0];
+      return seen.hasOwnProperty(billAddress) ? false : (seen[billAddress]=true);
+    })
+    .sort((a,b) => {
+      return new Date(a.date).getDate() > new Date(b.date).getDate() ? -1 : 1; 
+    })
+    .forEach( (bill,index,collection) => {
     console.log(bill.matchedStrings[0], bill.date);
     let address = bill.matchedStrings[0]; 
     navigate(address,index,collection)
   })
 })
-
-//navigate to each location, save the relevant data
 
