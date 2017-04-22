@@ -1,9 +1,7 @@
 # liquid-earth
 Tools for putting liquid votes in spatial context
 
-![](https://github.com/liquidvote/liquid-earth/blob/master/Almost.gif)
 ![](https://github.com/liquidvote/liquid-earth/blob/master/Done.gif)
-
 
 ### Dependencies
 
