@@ -54,7 +54,8 @@ return fetch("https://api.liquid.vote/bills")
         return !hasMatched; 
       });
 
-      //
+      //if any addresses remain in the array
+      //then that bill contains a valid address
       return excludedMatches.length;
 
     })
