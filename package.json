@@ -1,0 +1,34 @@
+{
+  "name": "liquid-earth",
+  "version": "0.0.1",
+  "description": "Putting liquid on the map",
+  "main": "liquid_earth.js",
+  "dependencies": {
+    "chromedriver": "^2.29.0",
+    "node-fetch": "^1.6.3",
+    "selenium-webdriver": "^3.3.0",
+    "node-postal": "^1.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/liquidvote/liquid-earth.git"
+  },
+  "keywords": [
+    "selenium",
+    "google",
+    "earth",
+    "libpostal",
+    "spatial",
+    "maps"
+  ],
+  "author": "nsipplswezey",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/liquidvote/liquid-earth/issues"
+  },
+  "homepage": "https://github.com/liquidvote/liquid-earth#readme"
+}

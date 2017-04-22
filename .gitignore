@@ -1,0 +1,4 @@
+*.swp
+
+libpostal/
+node_modules
