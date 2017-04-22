@@ -4,68 +4,65 @@ const fetch = require('node-fetch');
 //digits followed by any number of capitalized words
 const re = /\d+\s([A-Z][a-zA-Z]*\s*)+/g;
 
-function requestAddresses(url,customFilter){
-  url = url || "https://api.liquid.vote/bills";
-  customFilter = customFilter || (bill => true);
+function requestAddresses(url, customFilter) {
+    url = url || "https://api.liquid.vote/bills";
+    customFilter = customFilter || (bill => true);
 
-return fetch("https://api.liquid.vote/bills")
-.then(response => response.json())
-.then((bills) => {
-  
-  let billsWithAddresses = bills
-    .map( (bill) => {
-        let matchedStrings = bill.title.match(re);
-        bill["matchedStrings"] = matchedStrings;
-        return bill; 
-    })
-    .filter((bill) => {
-      //console.log(bill);
-      return bill.matchedStrings; 
-    })
-    .filter((matchedBill) => {
-       let exclusionTerms = { 
-        "2013 Code":true, 
-        "2016 Election":true,
-        "2017 Emergency Preparedness Grants":true,
-        "2017 Budget":true,
-        "2017 Taxi":true,
-        "02 Credit":true, 
-        "Annual Base Rent":true, 
-        "2017 Calendar Year":true, 
-        "2004 Calendar Year":true, 
-        "2012 MOE":true, 
-        "2004 Trust":true,
-        "2016 Edition":true,
-        "Initial Annual Base Rent":true,
-        "000 Payment":true,
-      };
+    return fetch("https://api.liquid.vote/bills")
+        .then(response => response.json())
+        .then((bills) => {
 
-      let excludedMatches = matchedBill.matchedStrings.filter((string) => {
-        
-        let hasMatched = false;
-        for(let key in exclusionTerms){
+            let billsWithAddresses = bills
+                .map((bill) => {
+                    let matchedStrings = bill.title.match(re);
+                    bill["matchedStrings"] = matchedStrings;
+                    return bill;
+                })
+                .filter((bill) => {
+                    //console.log(bill);
+                    return bill.matchedStrings;
+                })
+                .filter((matchedBill) => {
+                    let exclusionTerms = {
+                        "2013 Code": true,
+                        "2016 Election": true,
+                        "2017 Emergency Preparedness Grants": true,
+                        "2017 Budget": true,
+                        "2017 Taxi": true,
+                        "02 Credit": true,
+                        "Annual Base Rent": true,
+                        "2017 Calendar Year": true,
+                        "2004 Calendar Year": true,
+                        "2012 MOE": true,
+                        "2004 Trust": true,
+                        "2016 Edition": true,
+                        "Initial Annual Base Rent": true,
+                        "000 Payment": true,
+                    };
 
-          hasMatched = string.includes(key);
-          if(hasMatched){
-            return !hasMatched;
-          }
-        }
+                    let excludedMatches = matchedBill.matchedStrings.filter((string) => {
 
-        return !hasMatched; 
-      });
+                        let hasMatched = false;
+                        for (let key in exclusionTerms) {
 
-      //if any addresses remain in the array
-      //then that bill contains a valid address
-      return excludedMatches.length;
+                            hasMatched = string.includes(key);
+                            if (hasMatched) {
+                                return !hasMatched;
+                            }
+                        }
 
-    })
-    .filter((matches) => {
-      return true;
-    })
-    .filter(customFilter);
-  
-    return billsWithAddresses
-  });
+                        return !hasMatched;
+                    });
+
+                    //if any addresses remain in the array
+                    //then that bill contains a valid address
+                    return excludedMatches.length;
+
+                })
+                .filter(customFilter);
+
+            return billsWithAddresses
+        });
 
 }
 

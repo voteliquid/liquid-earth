@@ -10,7 +10,11 @@
 require('chromedriver');
 const requestAddresses = require("./parse-addresses.js");
 
-const {Builder, By, until} = require('selenium-webdriver');
+const {
+    Builder,
+    By,
+    until
+} = require('selenium-webdriver');
 
 //A bunch of custom WebComponent selectors and actions becuse new Google Earth is built in polymer, so simple selectors are tricky
 //TODO: Refactor selector actions to separate file
@@ -47,109 +51,112 @@ var driver = new Builder()
 //Initial get, wait for load, exit intro, and toggleAll feature layers
 driver.get('https://earth.google.com/web/')
 driver.sleep(10000)
-  .then(() =>{
-    driver.executeScript(closeIntroScript);
-    driver.executeScript(toggleAll);
-  });
+    .then(() => {
+        driver.executeScript(closeIntroScript);
+        driver.executeScript(toggleAll);
+    });
 
 
 //Collect urls for app linking
-function getEarthUrl(fullAddress,index,collection) {
-  
-  //we're done, store the data 
-  //if(locationData.length === collection.length){
+function getEarthUrl(fullAddress, index, collection) {
+
+    //we're done, store the data
+    //if(locationData.length === collection.length){
     //TODO: Put the data in a useful place
     //return;
-  //}
-  
-  //store the data
-  driver.getCurrentUrl().then((url) => {
-    locationData[index] = {
-      address: fullAddress,
-      earthSearchUrl: url
+    //}
+
+    //store the data
+    driver.getCurrentUrl().then((url) => {
+        locationData[index] = {
+            address: fullAddress,
+            earthSearchUrl: url
+        }
+    })
+    driver.sleep(1000);
+    driver.getCurrentUrl().then((url) => {
+        locationData[index] = Object.assign({
+                earthFoundUrl: url
+            },
+            locationData[index])
+
+    })
+
+}
+
+
+//Navigate to each location
+function navigate(address, index, collection) {
+    let city = ', San Francisco'
+    let fullAddress = address + city;
+
+    driver.executeScript(clearSearch);
+    driver.executeScript(openPanel);
+
+    let activeElement = driver.switchTo().activeElement();
+
+    if (!activeElement.getText() === "") {
+        console.log('active element text');
+        console.log(activeElement.getText());
+        activeElement.clear();
     }
-  })
-  driver.sleep(1000);
-  driver.getCurrentUrl().then((url) => {
-    locationData[index] = Object.assign(
-      {earthFoundUrl: url},
-      locationData[index])
 
-  })
+    driver.switchTo().activeElement().sendKeys(fullAddress, '\uE006');
 
-}
+    driver.sleep(1000);
 
+    //If multiple search items, select first, hide, toggle 3d
+    driver.executeScript('return ' + topResult)
+        .then((result) => {
+            console.log('checking if multiple items');
+            if (result) {
+                console.log('selecting first result, hiding and clearing...')
+                driver.executeScript(clickTopResult);
+                driver.executeScript(hideSearch);
+                driver.sleep(5000).then(() => {
+                    driver.executeScript(toggleDimension)
+                });
+            }
 
-//Navigate to each location 
-function navigate(address,index,collection){
-  let city = ', San Francisco'
-  let fullAddress = address + city;
- 
-  driver.executeScript(clearSearch);
-  driver.executeScript(openPanel);
+            //Loop infinitely; mediate
+            if (index === collection.length - 1) {
+                driver.sleep(pauseTime).then(() => {
+                    console.log('starting to loop infinite')
+                    collection.forEach((bill, index, collection) => {
+                        navigate(bill.matchedStrings[0], index, collection)
+                    });
+                })
+            }
 
-  let activeElement = driver.switchTo().activeElement();
-
-  if(!activeElement.getText() === ""){
-    console.log('active element text');
-    console.log(activeElement.getText());
-    activeElement.clear();  
-  }
-
-  driver.switchTo().activeElement().sendKeys(fullAddress, '\uE006');
- 
-  driver.sleep(1000);
-
-  //If multiple search items, select first, hide, toggle 3d
-  driver.executeScript('return ' + topResult)
-    .then((result)=>{
-      console.log('checking if multiple items');
-      if(result){
-        console.log('selecting first result, hiding and clearing...')
-        driver.executeScript(clickTopResult);
-        driver.executeScript(hideSearch);
-        driver.sleep(5000).then(() => {driver.executeScript(toggleDimension)});
-      }
-      
-      //Loop infinitely; mediate
-      if(index === collection.length-1){
-        driver.sleep(pauseTime).then(() => {
-          console.log('starting to loop infinite')
-          collection.forEach((bill,index,collection) => {
-            navigate(bill.matchedStrings[0],index,collection)});
         })
-      }
 
-    })
+    //grab url, pause before next navigation
+    getEarthUrl(fullAddress, index);
+    driver.sleep(pauseTime);
 
-  //grab url, pause before next navigation
-  getEarthUrl(fullAddress,index); 
-  driver.sleep(pauseTime);
-  
 }
 
 
-function latestDate(bill){
-  
-  return bill.date === "2017-04-25" || bill.date === "2017-04-18";
+function latestDate(bill) {
+
+    return bill.date === "2017-04-25" || bill.date === "2017-04-18";
 }
 
-requestAddresses(null,latestDate).then( (addresses) => {
-  driver.sleep(15000);
+requestAddresses(null, latestDate).then((addresses) => {
+    driver.sleep(15000);
 
-  let seen = {};
-  addresses
-    .filter((bill,index,collection) => {
-      let billAddress = bill.matchedStrings[0];
-      return seen.hasOwnProperty(billAddress) ? false : (seen[billAddress]=true);
-    })
-    .sort((a,b) => {
-      return new Date(a.date).getDate() > new Date(b.date).getDate() ? -1 : 1; 
-    })
-    .forEach( (bill,index,collection) => {
-    console.log(bill.matchedStrings[0], bill.date);
-    let address = bill.matchedStrings[0]; 
-    navigate(address,index,collection)
-  })
+    let seen = {};
+    addresses
+        .filter((bill, index, collection) => {
+            let billAddress = bill.matchedStrings[0];
+            return seen.hasOwnProperty(billAddress) ? false : (seen[billAddress] = true);
+        })
+        .sort((a, b) => {
+            return new Date(a.date).getDate() > new Date(b.date).getDate() ? -1 : 1;
+        })
+        .forEach((bill, index, collection) => {
+            console.log(bill.matchedStrings[0], bill.date);
+            let address = bill.matchedStrings[0];
+            navigate(address, index, collection)
+        })
 })
-
