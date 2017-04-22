@@ -1,7 +1,9 @@
 # liquid-earth
 Tools for putting liquid votes in spatial context
 
-![](https://github.com/liquidvote/liquid-earth/blob/master/fat.gif)
+![](https://github.com/liquidvote/liquid-earth/blob/master/Almost.gif)
+![](https://github.com/liquidvote/liquid-earth/blob/master/Done.gif)
+
 
 ### Dependencies
 
@@ -19,7 +21,7 @@ cd liquid-earth
 npm install
 ```
 
-Then whenever you want to develop in the iOS simulator:
+Then to fire up the new google earth in chrome:
 
 ```
 node liquid-earth.js
