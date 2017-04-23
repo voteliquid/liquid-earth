@@ -30,6 +30,7 @@ hideSearch,
 clearSearch, 
 toggleDimension 
 } = require("./webcomponent-selectors.js");
+
 //Empty array for output
 const locationData = [];
 const pauseTime = 5000;
@@ -115,7 +116,7 @@ function navigate(address, index, collection) {
                 driver.sleep(pauseTime).then(() => {
                     console.log('starting to loop infinite')
                     collection.forEach((bill, index, collection) => {
-                        navigate(bill.matchedStrings[0], index, collection)
+                        navigate(bill.streetAddress[0], index, collection)
                     });
                 })
             }
@@ -140,15 +141,15 @@ requestAddresses(null, latestDate).then((addresses) => {
     let seen = {};
     addresses
         .filter((bill, index, collection) => {
-            let billAddress = bill.matchedStrings[0];
+            let billAddress = bill.streetAddresses[0];
             return seen.hasOwnProperty(billAddress) ? false : (seen[billAddress] = true);
         })
         .sort((a, b) => {
             return new Date(a.date).getDate() > new Date(b.date).getDate() ? -1 : 1;
         })
         .forEach((bill, index, collection) => {
-            console.log(bill.matchedStrings[0], bill.date);
-            let address = bill.matchedStrings[0];
+            let address = bill.streetAddresses[0];
+            console.log(address, bill.date);
             navigate(address, index, collection)
         })
 })

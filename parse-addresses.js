@@ -2,7 +2,8 @@ const fetch = require('node-fetch');
 //const postal = require('node-postal');
 
 //digits followed by any number of capitalized words
-const re = /\d+\s([A-Z][a-zA-Z]*\s*)+/g;
+const reStreetAddress = /\d+\s([A-Z][a-zA-Z]*\s*)+/g;
+
 
 function requestAddresses(url, customFilter) {
     url = url || "https://api.liquid.vote/bills";
@@ -14,13 +15,13 @@ function requestAddresses(url, customFilter) {
 
             let billsWithAddresses = bills
                 .map((bill) => {
-                    let matchedStrings = bill.title.match(re);
-                    bill["matchedStrings"] = matchedStrings;
+                    let matchedStrings = bill.title.match(reStreetAddress);
+                    bill["streetAddresses"] = matchedStrings;
                     return bill;
                 })
                 .filter((bill) => {
                     //console.log(bill);
-                    return bill.matchedStrings;
+                    return bill.streetAddresses;
                 })
                 .filter((matchedBill) => {
                     let exclusionTerms = {
@@ -40,7 +41,7 @@ function requestAddresses(url, customFilter) {
                         "000 Payment": true,
                     };
 
-                    let excludedMatches = matchedBill.matchedStrings.filter((string) => {
+                    let excludedMatches = matchedBill.streetAddresses.filter((string) => {
 
                         let hasMatched = false;
                         for (let key in exclusionTerms) {
