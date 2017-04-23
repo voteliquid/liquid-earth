@@ -8,7 +8,7 @@ function requestAddresses(url, customFilter) {
     url = url || "https://api.liquid.vote/bills";
     customFilter = customFilter || (bill => true);
 
-    return fetch("https://api.liquid.vote/bills")
+    return fetch(url)
         .then(response => response.json())
         .then((bills) => {
 
