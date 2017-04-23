@@ -16,8 +16,6 @@ const {
     until
 } = require('selenium-webdriver');
 
-//A bunch of custom WebComponent selectors and actions becuse new Google Earth is built in polymer, so simple selectors are tricky
-//TODO: Refactor selector actions to separate file
 const {
   closeIntroScript,
   openPanel,
@@ -116,7 +114,8 @@ function navigate(address, index, collection) {
                 driver.sleep(pauseTime).then(() => {
                     console.log('starting to loop infinite')
                     collection.forEach((bill, index, collection) => {
-                        navigate(bill.streetAddress[0], index, collection)
+                        let address = bill.streetAddresses[0];
+                        navigate(address, index, collection)
                     });
                 })
             }
