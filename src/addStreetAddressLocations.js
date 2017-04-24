@@ -17,10 +17,7 @@ function addAddresses(bills, url) {
                 return bill;
             })
             .filter((bill) => {
-                //console.log(bill);
-                return bill.streetAddresses;
-            })
-            .filter((matchedBill) => {
+                
                 let exclusionTerms = {
                     "2013 Code": true,
                     "2016 Election": true,
@@ -42,11 +39,11 @@ function addAddresses(bills, url) {
                     "098 Settlement": true,
                     "156 Hertz Corporation": true,
                     "60 Days": true,
-
-
                 };
 
-                let excludedMatches = matchedBill.streetAddresses.filter((string) => {
+                if (bill.streetAddresses){
+                  let excludedMatches = bill.streetAddresses
+                  .filter((string) => {
 
                     let hasMatched = false;
                     for (let key in exclusionTerms) {
@@ -63,12 +60,16 @@ function addAddresses(bills, url) {
                 //if any addresses remain in the array
                 //then that bill contains a valid address
                 return excludedMatches.length;
-
+                } else {
+                  //no regex address match
+                  //we leave these bills untouched
+                return true;
+                }
             })
 
         return billsWithAddresses
     }
 }
-//addAddresses(null, bill => bill.streetAddresses).then(bills => console.log(bills));
+//addAddresses(null).then(bills => console.log(bills));
 
 module.exports = addAddresses;

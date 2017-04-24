@@ -6,9 +6,9 @@ const fetch = require('node-fetch');
 function addProperNameLocations(bills, customFilter, url) {
     url = url || "https://api.liquid.vote/bills";
     customFilter = customFilter || (bill => true);
-    return bills ? add(bills) : fetch(url).then(response => response.json()).then(add)
+    return bills ? add(bills,customFilter) : fetch(url).then(response => response.json()).then(bills => {return add(bills,customFilter)})
 
-    function add(bills) {
+    function add(bills,customFilter) {
 
         let inclusionList = {
             "Laguna Honda Hospital": true,
@@ -25,11 +25,12 @@ function addProperNameLocations(bills, customFilter, url) {
                 return bill;
             })
             .filter(customFilter);
+
         return billsWithProperNameLocations;
     }
 }
 
 
-addProperNameLocations(null, bill => bill.properNameLocation).then(bills => console.log(bills));
+//addProperNameLocations(null, bill => bill.properNameLocation).then(bills => console.log(bills));
 
 module.exports = addProperNameLocations;
