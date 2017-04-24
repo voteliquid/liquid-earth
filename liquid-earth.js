@@ -8,7 +8,8 @@
  */
 
 require('chromedriver');
-const requestAddresses = require("./parse-addresses.js");
+const fetch = require('node-fetch');
+const addStreetAddressLocations = require("./src/addStreetAddressLocations.js");
 
 const {
     Builder,
@@ -77,8 +78,9 @@ function getEarthUrl(fullAddress, index, collection) {
 
 
 //Navigate to each location
-function navigate(address, index, collection) {
+function navigate(bill, index, collection) {
     let city = ', San Francisco'
+    let address = bill.streetAddresses[0];
     let fullAddress = address + city;
 
     driver.executeScript(clearSearch);
@@ -99,6 +101,8 @@ function navigate(address, index, collection) {
     //If multiple search items, select first, hide, toggle 3d
     driver.executeScript('return ' + topResult)
         .then((result) => {
+            console.log(`navigating to ${fullAddress}`)
+            console.log(bill.title)
             console.log('checking if multiple items');
             if (result) {
                 console.log('selecting first result, hiding and clearing...')
@@ -134,7 +138,10 @@ function latestDate(bill) {
     return bill.date === "2017-04-25" || bill.date === "2017-04-18";
 }
 
-requestAddresses(null, latestDate).then((addresses) => {
+fetch("https://api.liquid.vote/bills")
+  .then(response => response.json())
+  .then( (bills,latestDate) => {return addStreetAddressLocations(bills,latestDate)} )
+  .then((addresses) => {
     driver.sleep(15000);
 
     let seen = {};
@@ -147,8 +154,7 @@ requestAddresses(null, latestDate).then((addresses) => {
             return new Date(a.date).getDate() > new Date(b.date).getDate() ? -1 : 1;
         })
         .forEach((bill, index, collection) => {
-            let address = bill.streetAddresses[0];
-            console.log(address, bill.date);
-            navigate(address, index, collection)
+            console.log(bill.streetAddresses, bill.date);
+            navigate(bill, index, collection)
         })
 })
