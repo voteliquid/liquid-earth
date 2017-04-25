@@ -10,9 +10,15 @@ function addProperNameLocations(bills, customFilter, url) {
 
     function add(bills,customFilter) {
 
+      //to get a referenceable single location URL
+      //certain location searches work better than others
+      //ex. "Moscone Center" works better than "George R. Moscone Convention Center"
+      //The former goes to a single correct location
+      //The later also matches to an elementary school
+      //Use the value associated with the key as the search term
         let inclusionList = {
-            "Laguna Honda Hospital": true,
-            "George R. Moscone Convention Center": true,
+            "Laguna Honda Hospital": "Laguna Honda Hospital",
+            "George R. Moscone Convention Center": "Moscone Center",
         }
 
 
@@ -20,7 +26,7 @@ function addProperNameLocations(bills, customFilter, url) {
             .map((bill) => {
                 bill["properNameLocation"] = null;
                 for (let locationName in inclusionList) {
-                    bill.title.includes(locationName) ? bill["properNameLocation"] = locationName : null
+                    bill.title.includes(locationName) ? bill["properNameLocation"] = inclusionList[locationName] : null
                 }
                 return bill;
             })
