@@ -30,11 +30,13 @@ clickTopResult,
 hideSearch, 
 clearSearch, 
 toggleDimension 
-} = require("./webcomponent-selectors.js");
+} = require("./src/webcomponent-selectors.js");
 
 //Empty array for output
 const locationData = [];
 const pauseTime = 10000;
+const startupTime = 30000;
+
 
 //Set up driver
 var driver = new Builder()
@@ -203,7 +205,7 @@ fetch("https://api.liquid.vote/bills")
   //.then( bills => bills.filter(hasLocation) )
   //.then( bills => _.uniqBy(bills, bill => location = bill.properNameLocation || bill.streetAddresses[0]))
   .then( bills => _.sortBy(bills, bill => new Date(bill.date).getDate() ))
-  .then( bills => driver.sleep(20000).then( _ => bills) )
+  .then( bills => driver.sleep(startupTime).then( _ => bills) )
   .then( bills => {
     return bills 
         .map((bill, index, collection) => {
